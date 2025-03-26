@@ -1,0 +1,116 @@
+# % macro, PMAC,  Pmac/Geobrick name
+# % macro, AXIS,    Axis number
+# % macro, PORT,    Asyn port
+record(stringout, "$(SYSP)$(DEVP)DESC") {
+  field(PINI, "YES")
+}
+
+record(ai, "$(SYSP)$(DEVP)Cur-I") {
+  field(DTYP, "asynFloat64")
+  field(SCAN, "I/O Intr")
+  field(INP, "@asyn($(PORT),0)PMAC_VDM_Motor[$(AXIS)].IdMeas")
+  field(PREC, "2")
+}
+
+record(ai, "$(SYSP)$(DEVP)Pos-I") {
+  field(DTYP, "asynFloat64")
+  field(SCAN, "I/O Intr")
+  field(INP, "@asyn($(PORT),0)PMAC_VDF_#$(AXIS)P")
+  field(PREC, "2")
+}
+
+record(ai, "$(SYSP)$(DEVP)Val:FollErr-I") {
+  field(DTYP, "asynFloat64")
+  field(SCAN, "I/O Intr")
+  field(INP, "@asyn($(PORT),0)PMAC_VDF_#$(AXIS)F")
+  field(PREC, "2")
+}
+
+record(ai, "$(SYSP)$(DEVP)Val:Vlcty-I") {
+  field(DTYP, "asynFloat64")
+  field(SCAN, "I/O Intr")
+  field(INP, "@asyn($(PORT),0)PMAC_VDF_#$(AXIS)V")
+  field(PREC, "2")
+}
+
+record(seq, "$(SYSP)$(DEVP)ReadBack") {
+  field(LNK1, "$(SYSP)$(DEVP)POSITION.PROC PP")
+  field(LNK2, "$(SYSP)$(DEVP)FOLL_ERROR.PROC PP")
+  field(LNK3, "$(SYSP)$(DEVP)VELOCITY.PROC PP")
+  field(LNK4, "$(SYSP)$(DEVP)status1.PROC PP")
+  field(DLY1, "0")
+  field(DLY2, "0.5")
+  field(DLY3, "0.5")
+  field(DLY4, "0.5")
+  field(DOL1, "1")
+  field(DOL2, "1")
+  field(DOL3, "1")
+  field(DOL4, "1")
+}
+
+record(longin, "$(SYSP)$(DEVP)READ_STAT1") {
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+  field(INP, "@asyn($(PORT),$(AXIS))PMAC_C_AXIS_BITS01")
+  field(FLNK, "$(SYSP)$(DEVP)Sts:1-Sts")
+}
+
+#% archiver 10 Monitor
+record(mbbiDirect, "$(SYSP)$(DEVP)Sts:1-Sts") {
+  field(INP, "$(SYSP)$(DEVP)READ_STAT1")
+}
+
+record(longin, "$(SYSP)$(DEVP)READ_STAT2") {
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+  field(INP, "@asyn($(PORT),$(AXIS))PMAC_C_AXIS_BITS02")
+  field(FLNK, "$(SYSP)$(DEVP)Sts:2-Sts")
+}
+
+#% archiver 10 Monitor
+record(mbbiDirect, "$(SYSP)$(DEVP)Sts:2-Sts") {
+  field(INP, "$(SYSP)$(DEVP)READ_STAT2")
+}
+
+record(longin, "$(SYSP)$(DEVP)READ_STAT3") {
+  field(DTYP, "asynInt32")
+  field(SCAN, "I/O Intr")
+  field(INP, "@asyn($(PORT),$(AXIS))PMAC_C_AXIS_BITS03")
+  field(FLNK, "$(SYSP)$(DEVP)Sts:3-Sts")
+}
+
+#% archiver 10 Monitor
+record(mbbiDirect,"$(SYSP)$(DEVP)Sts:3-Sts") {
+  field(INP, "$(SYSP)$(DEVP)READ_STAT3")
+}
+
+record(mbbi, "$(SYSV)$(DEVV)Sts:HomeCmplt-Sts_") {
+  field(DESC, "Home complete bit extraction")
+  field(PINI, "YES")
+  field(SCAN, "Passive")
+  field(DTYP, "Raw Soft Channel")
+  field(INP,  "$(SYSP)$(DEVP)Sts:2-Sts CPP")
+  field(NOBT, "1")
+  field(SHFT, "15")
+  field(FLNK, "$(SYSV)$(DEVV)Sts:HomeCmplt-Sts")
+}
+
+record(bi, "$(SYSV)$(DEVV)Sts:HomeCmplt-Sts") {
+  field(DESC, "Home complete status")
+  field(PINI, "NO")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(INP,  "$(SYSV)$(DEVV)Sts:HomeCmplt-Sts_")
+  field(ZNAM, "Not homed")
+  field(ONAM, "Homed")
+  field(ZSV,  "MINOR")
+  field(OSV,  "NO_ALARM")
+}
+
+record(bo, "$(SYSV)$(DEVV)Cmd:Kill-Cmd")
+{
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(AXIS),$(TIMEOUT=4))PMAC_C_KILL_AXIS")
+    field(VAL, "0")
+}
+

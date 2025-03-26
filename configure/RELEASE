@@ -1,0 +1,11 @@
+# Ansible managed
+#
+# RELEASE location of any EPICS module deps for ppmac
+#
+
+PPMAC=/epics/modules/ppmac
+PPMAC=/epics/modules/ppmac
+PMAC=/epics/modules/pmac
+EPICS_BASE=/usr/lib/epics
+
+-include $(TOP)/../configure/EPICS_BASE.$(EPICS_HOST_ARCH)
