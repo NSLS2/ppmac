@@ -1,0 +1,12 @@
+.vscode/
+venv/
+*.swp
+O.*/
+lib/
+bin/
+dbd/
+db/
+include/
+*.local
+.iocsh_history
+
