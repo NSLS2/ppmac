@@ -17,11 +17,11 @@ ppmac_DBD += base.dbd
 
 # Include dbd files from all support applications:
 ppmac_DBD += asyn.dbd drvAsynPowerPMACPort.dbd motorSupport.dbd devSoftMotor.dbd pmacAsynMotorPort.dbd busySupport.dbd calcSupport.dbd stream.dbd
-ppmac_DBD += asSupport.dbd system.dbd devIocStats.dbd
+ppmac_DBD += asSupport.dbd system.dbd devIocStats.dbd reccaster.dbd
 
 # Add all the support libraries needed by this IOC
 ppmac_LIBS += asyn calc busy pmacAsynMotorPort softMotor motor powerPmacAsynPort  
-ppmac_LIBS += autosave stream devIocStats
+ppmac_LIBS += autosave stream devIocStats reccaster
 
 # ppmac_registerRecordDeviceDriver.cpp derives from ppmac.dbd
 ppmac_SRCS += ppmac_registerRecordDeviceDriver.cpp
