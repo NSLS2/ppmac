@@ -348,7 +348,7 @@ record(stringout, "$(SYS){$(PMAC)}Cmd:Echo-Cmd")
     field(DTYP, "asynOctetWrite")
     field(OUT,  "@asyn($(PORT) 0)")
     field(VAL,  "echo 7")
-    field(SCAN, "passive")
+    field(SCAN, "Passive")
     info(autosaveFields, "SCAN")
 }
 
