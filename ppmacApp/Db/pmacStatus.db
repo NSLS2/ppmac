@@ -278,6 +278,21 @@ record(longin, "$(SYS){$(PMAC)}Cnt:Axes-I") {
   field(VAL, "$(NAXES)")
 }
 
+
+record(stringout, "$(SYS){$(PMAC)}Cmd:Echo-Cmd")
+{
+    field(DESC, "set echo 7")
+    field(DTYP, "asynOctetWrite")
+    field(OUT,  "@asyn($(PORT) 0)")
+    field(VAL,  "echo 7")
+    field(SCAN, "passive")
+    info(autosaveFields, "SCAN")
+}
+
+
+
+
+
 #! Further lines contain data used by VisualDCT
 #! View(1463,2287,1.0)
 #! Record("$(SYS){$(PMAC)}Sts:Read1-FOut",3320,1966,0,1,"$(SYS){$(PMAC)}Sts:Read1-FOut")

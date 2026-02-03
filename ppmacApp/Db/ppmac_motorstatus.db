@@ -9,6 +9,7 @@
 # PORT: asyn port name to the PMAC (for instance PMAC_S0)
 # AXIS: PMAC axis number to request the status word for
 
+
 record(ai, "$(SYS)$(DEV)PhaseCur-I") {
   field(DESC, "actual motor current readback")
   field(PINI, "1")
