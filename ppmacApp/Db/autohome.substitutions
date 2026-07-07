@@ -1,0 +1,6 @@
+file "${PPMAC}/db/autohome.db"
+{
+pattern
+{SYS,              DEV        PLC,  PORT  }
+{"Prefix",  "Device",       0,    P0    }
+}

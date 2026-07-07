@@ -1,3 +1,5 @@
+# Extra PVs if the real motor is part of a coordinate system
+
 ############################################################
 #
 # Template to distiguish real motor record initiated moves 
@@ -6,19 +8,19 @@
 ###############################################################
 
 #Calculate if a move was internal or not
-record(calcout, "$(P)$(M):MR_MIP_INTERNAL") {
+record(calcout, "$(P)$(M)Mtr:MR_MIP_INTERNAL") {
   field(DESC, "MR internal")
   field(DTYP, "Soft Channel")
   field(CALC, "(A#0)&&(A#B)")
-  field(INPA, "$(P)$(M).MIP CP")
+  field(INPA, "$(P)$(M)Mtr.MIP CP")
   field(INPB, "32768")  
-  field(OUT, "$(P)$(M):MR_MIP_INTERNAL_FLAG PP")
+  field(OUT, "$(P)$(M)Mtr:MR_MIP_INTERNAL_FLAG PP")
   field(DOPT, "Use CALC")
   field(OOPT, "Transition To Non-zero")
 }
 
 #Cache the internal move flag
-record(bo, "$(P)$(M):MR_MIP_INTERNAL_FLAG") {
+record(bo, "$(P)$(M)Mtr:MR_MIP_INTERNAL_FLAG") {
   field(DTYP, "Soft Channel")
   field(ZNAM, "External")
   field(ONAM, "Internal")
@@ -27,54 +29,106 @@ record(bo, "$(P)$(M):MR_MIP_INTERNAL_FLAG") {
 }
 
 #When DMOV = 1 and mip internal flag is set
-record(calcout, "$(P)$(M):MR_DMOV") {
+record(calcout, "$(P)$(M)Mtr:MR_DMOV") {
   field(DESC, "MR Done")
   field(DTYP, "Soft Channel")
   field(CALC, "(A=1)&&(B=1)")
-  field(INPA, "$(P)$(M).DMOV CP")
-  field(INPB, "$(P)$(M):MR_MIP_INTERNAL_FLAG")  
-  field(OUT, "$(P)$(M):MR_MOVE_WRITE.PROC PP")
+  field(INPA, "$(P)$(M)Mtr.DMOV CP")
+  field(INPB, "$(P)$(M)Mtr:MR_MIP_INTERNAL_FLAG")  
+  field(OUT, "$(P)$(M)Mtr:MR_MOVE_WRITE.PROC PP")
   field(DOPT, "Use CALC")
   field(OOPT, "Transition To Non-zero")
 }
 
 #Write 1 to p47xx
-record(longout, "$(P)$(M):MR_MOVE_WRITE") {
+record(ao, "$(P)$(M)Mtr:MR_MOVE_WRITE") {
   field(DESC, "Motor record move")
-  field(DTYP, "stream")
-  field(VAL, "1")  
-  field(OUT, "@pmacCoord.proto moveWrite($(P)$(M)) $(SPORT)")
-  field(FLNK, "$(P)$(M):MR_RESET_FLAGS")  
+  field(DTYP, "asynFloat64")
+  field(VAL, "1")
+  field(OUT, "@asyn($(PORT),0)PMAC_WD_P`4700+$(ADDR)`")
+  field(FLNK, "$(P)$(M)Mtr:MR_RESET_FLAGS")  
 }
 
 #Reset the internal move flag
-record(seq, "$(P)$(M):MR_RESET_FLAGS") {
+record(seq, "$(P)$(M)Mtr:MR_RESET_FLAGS") {
   field(DESC, "Reset MIP flags")
   field(DO1, "0")
-  field(LNK1, "$(P)$(M):MR_MIP_INTERNAL_FLAG PP")
+  field(LNK1, "$(P)$(M)Mtr:MR_MIP_INTERNAL_FLAG PP")
 }
 
 #calc mres to be written
-record(calcout, "$(P)$(M):MRES_CALC") {
+record(calcout, "$(P)$(M)Mtr:MRES_CALC") {
   field(CALC, "B?-A*C:A*C")
-  field(INPA, "$(P)$(M).MRES CP")
-  field(INPB, "$(P)$(M).DIR CP")  
-  field(INPC, "$(P)$(M):SCALE")    
-  field(OUT, "$(P)$(M):MRES_SET PP")    
+  field(INPA, "$(P)$(M)Mtr.MRES CP")
+  field(INPB, "$(P)$(M)Mtr.DIR CP")  
+  field(INPC, "$(P)$(M)Mtr:SCALE")    
+  field(OUT, "$(P)$(M)Mtr:MRES_SET PP")    
   field(OOPT, "When Non-zero")  
 }
 
-record(ao, "$(P)$(M):MRES_SET") {
-  field(DTYP, "stream")
-  field(OUT, "@pmacCoord.proto mresWrite($(P)$(M)) $(SPORT)")
-  field(FLNK, "$(P)$(M):MR_MOVE_WRITE")  
+record(ao, "$(P)$(M)Mtr:MRES_SET") {
+  field(DTYP, "asynFloat64")
+  field(OUT, "@asyn($(PORT),$(ADDR),0)PMAC_MRES")
+  field(FLNK, "$(P)$(M)Mtr:MR_MOVE_WRITE")  
 }
 
 #calc off to be written
-record(calcout, "$(P)$(M):OFF_SET") {
-  field(DTYP, "stream")
+record(calcout, "$(P)$(M)Mtr:OFF_SET") {
   field(CALC, "A")
-  field(INPA, "$(P)$(M).OFF CP")
-  field(OUT, "@pmacCoord.proto offWrite($(P)$(M)) $(SPORT)")
-  field(FLNK, "$(P)$(M):MR_MOVE_WRITE")  
+  field(INPA, "$(P)$(M)Mtr.OFF CP")
+  field(OUT, "$(P)$(M)Mtr:_OFF_SET PP")
+}
+
+record(ao, "$(P)$(M)Mtr:_OFF_SET"){
+  field(DTYP, "asynFloat64")
+  field(OUT, "@asyn($(PORT),$(ADDR),0)PMAC_OFFSET")
+  field(FLNK, "$(P)$(M)Mtr:MR_MOVE_WRITE")  
+}
+
+
+############################################################
+#
+# Template to allow coordinate system kinematics to know
+# the resolution of each real motor
+#
+# Also to allow control of CS mappings of real motors
+#
+###############################################################
+
+
+###############################################################
+# Coordinate System mapping control
+###############################################################
+
+# Read back which CS number the axis is in
+record(ai, "$(P)$(M)Mtr:CsRaw_RBV")
+{
+    field(DTYP, "asynInt32")
+    field(INP, "@asyn($(PORT),$(ADDR))PMAC_C_AXIS_CS")
+    field(PINI, "NO")
+    field(SCAN, "I/O Intr")
+}
+
+# Set which CS the axis is in via CSController Port Name
+record(mbbo, "$(P)$(M)Mtr:CsPort") {
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(PORT),$(ADDR))PMAC_C_GROUP_CS_PORT")
+}
+
+record(mbbi, "$(P)$(M)Mtr:CsPort_RBV") {
+  field(DTYP, "asynInt32")
+  field(INP, "@asyn($(PORT),$(ADDR))PMAC_C_GROUP_CS_PORT_RBV")
+  field(SCAN, "I/O Intr")
+}
+
+# set the axis' CS assignment (one of A B C U V W X Y Z I)
+record(stringout, "$(P)$(M)Mtr:CsAxis") {
+  field(DTYP, "asynOctetWrite")
+  field(OUT, "@asyn($(PORT),$(ADDR))PMAC_C_GROUP_ASSIGN")
+}
+
+record(stringin, "$(P)$(M)Mtr:CsAxis_RBV") {
+  field(DTYP, "asynOctetRead")
+  field(INP, "@asyn($(PORT),$(ADDR))PMAC_C_GROUP_ASSIGN_RBV")
+  field(SCAN, "I/O Intr")
 }

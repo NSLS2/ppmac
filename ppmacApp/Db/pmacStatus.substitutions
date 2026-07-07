@@ -1,0 +1,8 @@
+file "${PPMAC}/db/ppmacStatus.db"
+{
+pattern
+{SYS,            PMAC,    VERSION  PLC  PORT,  NAXES }
+{"Prefix",     "MC:1",   "1"      5    "M0",  8     }
+}
+
+
