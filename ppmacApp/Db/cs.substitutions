@@ -1,0 +1,15 @@
+# Define virtual axes in a coordinate system
+file "${PPMAC}/db/cs_motor.db"
+{
+pattern
+{P,                M,          MOTOR,  PORT,  ADDR,  DESC,         MRES,      EGU,  PREC }
+{"Prefix",  "Device",  "CS2",  "M0",  7,     "Coord Sys X", "0.0001",  "mm", 4,   }
+}
+
+# Define real motors that are used in a coordinate system
+file "${PPMAC}/db/motor_in_cs.template"
+{
+pattern
+{P,                M,        PORT,  ADDR  }
+{"Prefix",  "Device",    "M0",   1 }
+}

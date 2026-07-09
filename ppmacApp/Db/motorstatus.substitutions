@@ -1,0 +1,7 @@
+# SYSC and DEVC are the contorller specific PVs, by controller number and axis number
+file "${PPMAC}/db/ppmac_motorstatus.db"
+{
+pattern
+{SYS,              DEV,        PORT,  AXIS ,	SYSC,           DEVC         }
+{"Prefix",	"Device",     "M0",   1,	Prefix-CT,    "{MC:1-Ax:1}"}
+}

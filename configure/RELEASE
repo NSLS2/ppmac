@@ -35,7 +35,6 @@ RECCASTER=/usr/lib/epics
 AUTOSAVE=/usr/lib/epics
 BUSY=/usr/lib/epics
 CALC=/usr/lib/epics
-STREAM=/usr/lib/epics
 MOTOR=/usr/lib/epics
 SNCSEQ=/usr/lib/epics
 PMAC=/usr/lib/epics

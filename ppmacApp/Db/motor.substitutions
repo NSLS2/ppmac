@@ -1,0 +1,6 @@
+file "${PPMAC}/db/motor.db"
+{
+pattern
+{P,                M,      MOTOR,  PORT,  ADDR,  DESC,      MRES,      EGU,  PREC }
+{"Example",  "Example",    "M0",   "P0",  1,     "Axis 1", "0.0001",  "mm",   4    }
+}
